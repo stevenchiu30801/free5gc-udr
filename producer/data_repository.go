@@ -452,7 +452,51 @@ func HandleApplicationDataInfluenceDataInfluenceIdPatch(request *http_wrapper.Re
 }
 
 func HandleApplicationDataInfluenceDataInfluenceIdPut(request *http_wrapper.Request) *http_wrapper.Response {
-	return http_wrapper.NewResponse(http.StatusOK, nil, map[string]interface{}{})
+	logger.DataRepoLog.Infof("Handle ApplicationDataInfluenceDataInfluenceIdPut")
+
+	collName := "applicationData.influenceData"
+	influenceId := request.Params["influenceId"]
+	trafficInfluData := request.Body.(models.TrafficInfluData)
+
+	response, status := ApplicationDataInfluenceDataInfluenceIdPutProcedure(collName, influenceId, trafficInfluData)
+	if status == http.StatusCreated {
+		// According to 3GPP TS 29.519 V16.5.0 clause 6.2.6.3.1
+		// Contain the URI of the newly created resource with `Location` key in the header
+		groupUri := udr_context.UDR_Self().GetIPv4GroupUri(udr_context.NUDR_DR)
+		resourceUri := fmt.Sprintf("%s/application-data/influenceData/%s", groupUri, influenceId)
+		header := http.Header{
+			"Location": {resourceUri},
+		}
+		// Set the attribute TrafficInfluData.ResUri in HTTP response to link to created resource
+		// rspData.ResUri = resourceUri
+		return http_wrapper.NewResponse(http.StatusCreated, header, response)
+	} else if status == http.StatusOK {
+		return http_wrapper.NewResponse(http.StatusOK, nil, response)
+	} else if status == http.StatusNoContent {
+		return http_wrapper.NewResponse(http.StatusNoContent, nil, nil)
+	}
+
+	problemDetails := &models.ProblemDetails{
+		Status: http.StatusInternalServerError,
+		Cause:  "UNSPECIFIED",
+	}
+	return http_wrapper.NewResponse(int(problemDetails.Status), nil, problemDetails)
+
+}
+
+func ApplicationDataInfluenceDataInfluenceIdPutProcedure(collName, influenceId string, request models.TrafficInfluData) (
+	models.TrafficInfluData, int) {
+	putData := util.ToBsonM(request)
+	putData["influenceId"] = influenceId
+	filter := bson.M{"influenceId": influenceId}
+
+	isExisted := MongoDBLibrary.RestfulAPIPutOne(collName, filter, putData)
+
+	if isExisted {
+		return request, http.StatusOK
+	} else {
+		return request, http.StatusCreated
+	}
 }
 
 func HandleApplicationDataInfluenceDataSubsToNotifyGet(request *http_wrapper.Request) *http_wrapper.Response {

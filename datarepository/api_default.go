@@ -25,21 +25,6 @@ func HTTPApplicationDataInfluenceDataGet(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
 }
 
-// HTTPApplicationDataInfluenceDataInfluenceIdDelete -
-func HTTPApplicationDataInfluenceDataInfluenceIdDelete(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{})
-}
-
-// HTTPApplicationDataInfluenceDataInfluenceIdPatch -
-func HTTPApplicationDataInfluenceDataInfluenceIdPatch(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{})
-}
-
-// HTTPApplicationDataInfluenceDataInfluenceIdPut -
-func HTTPApplicationDataInfluenceDataInfluenceIdPut(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{})
-}
-
 // HTTPApplicationDataInfluenceDataSubsToNotifyGet -
 func HTTPApplicationDataInfluenceDataSubsToNotifyGet(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
