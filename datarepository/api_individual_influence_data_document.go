@@ -24,6 +24,14 @@ import (
 // HTTPApplicationDataInfluenceDataInfluenceIdDelete - Create or update an individual Influence Data resource
 func HTTPApplicationDataInfluenceDataInfluenceIdDelete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
+	// New HTTP request
+	req := http_wrapper.NewRequest(c.Request, nil)
+	req.Params["influenceId"] = c.Params.ByName("influenceId")
+
+	// Handle request
+	rsp := producer.HandleApplicationDataInfluenceDataInfluenceIdDelete(req)
+
+	c.Data(rsp.Status, "", nil)
 }
 
 // HTTPApplicationDataInfluenceDataInfluenceIdPatch - Modify part of the properties of an individual Influence Data resource

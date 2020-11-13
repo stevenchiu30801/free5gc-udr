@@ -444,7 +444,29 @@ func HandleApplicationDataInfluenceDataGet(request *http_wrapper.Request) *http_
 }
 
 func HandleApplicationDataInfluenceDataInfluenceIdDelete(request *http_wrapper.Request) *http_wrapper.Response {
-	return http_wrapper.NewResponse(http.StatusOK, nil, map[string]interface{}{})
+	logger.DataRepoLog.Infof("Handle ApplicationDataInfluenceDataInfluenceIdDelete")
+
+	collName := "applicationData.influenceData"
+	influenceId := request.Params["influenceId"]
+	status := ApplicationDataInfluenceDataInfluenceIdDeleteProcedure(collName, influenceId)
+
+	if status == http.StatusNoContent {
+		return http_wrapper.NewResponse(http.StatusNoContent, nil, nil)
+	}
+
+	problemDetails := &models.ProblemDetails{
+		Status: http.StatusInternalServerError,
+		Cause:  "UNSPECIFIED",
+	}
+	return http_wrapper.NewResponse(int(problemDetails.Status), nil, problemDetails)
+}
+
+func ApplicationDataInfluenceDataInfluenceIdDeleteProcedure(collName, influenceId string) int {
+	filter := bson.M{"influenceId": influenceId}
+
+	MongoDBLibrary.RestfulAPIDeleteOne(collName, filter)
+
+	return http.StatusNoContent
 }
 
 func HandleApplicationDataInfluenceDataInfluenceIdPatch(request *http_wrapper.Request) *http_wrapper.Response {
@@ -481,7 +503,6 @@ func HandleApplicationDataInfluenceDataInfluenceIdPut(request *http_wrapper.Requ
 		Cause:  "UNSPECIFIED",
 	}
 	return http_wrapper.NewResponse(int(problemDetails.Status), nil, problemDetails)
-
 }
 
 func ApplicationDataInfluenceDataInfluenceIdPutProcedure(collName, influenceId string, request models.TrafficInfluData) (
